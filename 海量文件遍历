@@ -1,0 +1,73 @@
+'''了解数据集的结构'''
+!tree -L 3 
+!tree -L 3 ./data
+
+
+
+
+
+'''
+解压 cat_12_test.zip，将解压后的文件存放在 ‘data/cat_12_test’
+解压cat_12_train.zip，将解压后的文件存放在‘data/cat_12_train’
+'''
+import zipfile
+import os
+
+def unzip(src_path, target_path):
+    #解压原始数据集，将src_path路径下的zip包解压至target_path目录下
+    if not os.path.isdir(target_path): #判断是否为目录(文件夹)，如果不是的话：
+        #Zipfile用以zip格式编码的压缩和解压，默认值为'r'，表示读已经存在的zip文件，'w'表示新建一个zip文档或覆盖一个已经存在的zip文档
+        z=zipfile.ZipFile(src_path,'r') 
+        #解压zip文档中的所有文件到当前目录。
+        z.extractall(path=target_path)
+        z.close()
+
+unzip('data/data10954/cat_12_test.zip','data/cat_12_test')
+unzip('data/data10954/cat_12_train.zip','data/cat_12_train')
+
+!tree -L 1 ./data
+
+
+
+
+
+'''
+文件遍历，通过给定目录，统计所有的不同子文件类型及占用内存
+'''
+import os
+
+# 创建两个字典，一个存放相同文件类型的数量，一个存放相同文件类型的大小
+size_dict={}
+type_dict={}
+
+def get_size_type(path):
+    # os.listdir(path)得到路径path下的所有文件，返回list列表形式
+    files=os.listdir(path)
+    for filename in files:
+        temp_path=os.path.join(path, filename)  # 路径拼接
+        if os.path.isdir(temp_path):
+             # 递归调用函数，实现深度文件名解析
+            get_size_type(temp_path)
+        elif os.path.isfile(temp_path):
+            # 获取文件后缀
+            type_name=os.path.splitext(temp_path)[1]
+            #无后缀名的文件
+            if not type_name:
+                type_dict.setdefault("None",0)
+                type_dict["None"]+=1
+                size_dict.setdefault("None",0)
+                size_dict["None"]+=os.path.getsize(temp_path)
+            # 有后缀的文件
+            else:
+                type_dict.setdefault(type_name,0)
+                type_dict[type_name]+=1
+                size_dict.setdefault(type_name,0)
+                size_dict[type_name]+=os.path.getsize(temp_path)
+
+get_size_type('data/cat_12_test')
+
+for types in type_dict.keys():
+    print("%s 下共有 %s 文件 %d 个，占用内存 %.2f MB" % ('data/cat_12_test', types, type_dict[types], \
+            size_dict[types]/(1024*1024)))
+print("总文件数：%d " % (sum(type_dict.values())))
+print("所占总内存：%.3f MB" % (sum(size_dict.values())/(1024*1024)))
