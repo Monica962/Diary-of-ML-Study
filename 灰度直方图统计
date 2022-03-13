@@ -1,0 +1,48 @@
+'''
+统计所有通道的灰度直方图
+'''
+import cv2  #引用opencv库
+import matplotlib.pyplot as plt 
+
+img=cv2.imread('data/image.jpg',1)
+
+#.reshape([-1])是把图像中多维的数据转换成一维，因为hist函数只接受一维的数组
+plt.hist(img.reshape(-1),256,[0,256])  
+
+plt.show()
+
+
+
+
+
+'''
+分通道统计灰度直方图
+'''
+import cv2
+import matplotlib.pyplot as plt 
+
+img=cv2.imread('data/image.jpg',1)
+histr1=cv2.calcHist([img], [0], None, [256],[0,256])
+histr2=cv2.calcHist([img],[1], None, [256],[0,256])
+histr3=cv2.calcHist([img],[2], None,[256],[0,256])
+plt.plot(histr1,color='b')
+plt.plot(histr2, color='g')
+plt.plot(histr3, color='r')
+plt.show()
+
+
+
+
+
+'''
+遍历分通道统计灰度直方图
+'''
+import cv2
+import matplotlib.pyplot as plt 
+
+img=cv2.imread('data/image.jpg',1)
+color=('r','g','b')
+for i,col in enumerate(color):  #必须第一个是序号，第二个是元素
+    histr=cv2.calcHist([img], [i], None, [256],[0,256])
+    plt.plot(histr, color=col)
+plt.show()
